@@ -871,15 +871,21 @@
     try { new Notification(title, { body }); } catch (e) {}
   }
 
-  /* ---------- Chrono ---------- */
+  /* ---------- Chrono (sauvegardé : survit au rechargement) ---------- */
   let mode = "focus";
   let running = false;
   let paused = false;
   let endAt = 0;
   let timer = null;
   let cycleDone = 0;
+  let currentDay = dayKey();
   const duration = m => state.settings[m] * 60000;
   let remaining = duration(mode);
+
+  function persistTimer() {
+    state.timer = { mode, running, paused, endAt, remaining, day: currentDay, cycleDone };
+    save();
+  }
 
   const fmt = ms => {
     const s = Math.max(0, Math.ceil(ms / 1000));
@@ -931,6 +937,16 @@
     setMantra();
     renderClock();
     renderCycle();
+    persistTimer();
+  }
+
+  function runTicker() {
+    clearInterval(timer);
+    running = true;
+    paused = false;
+    timer = setInterval(update, 250);
+    $("startBtn").textContent = "Pause";
+    renderClock();
   }
 
   function start() {
@@ -941,11 +957,8 @@
     }
     if (remaining <= 0) remaining = duration(mode);
     endAt = Date.now() + remaining;
-    running = true;
-    paused = false;
-    timer = setInterval(update, 250);
-    $("startBtn").textContent = "Pause";
-    renderClock();
+    runTicker();
+    persistTimer();
   }
 
   function stop() {
@@ -961,43 +974,88 @@
     paused = true;
     $("startBtn").textContent = "Reprendre";
     renderClock();
+    persistTimer();
   }
 
   const toggle = () => (running ? pause() : start());
 
   function update() {
+    checkDay();
     remaining = endAt - Date.now();
-    if (remaining <= 0) complete();
+    if (remaining <= 0) complete(endAt);
     else renderClock();
   }
 
-  function complete() {
+  // at = moment où la séance s'est terminée ; silent = fini pendant que la page était fermée
+  function complete(at = Date.now(), silent = false) {
     stop();
     remaining = 0;
-    ding();
+    if (!silent) ding();
     if (mode === "focus") {
-      logSession();
-      cycleDone++;
-      notify("Pomodoro terminé", "Un livre de plus sur l'étagère. Pause !");
-      setMode(cycleDone % state.settings.every === 0 ? "long" : "short");
+      const endDate = new Date(at);
+      logSession(endDate);
+      if (dayKey(endDate) === currentDay) cycleDone++;
+      if (!silent) notify("Pomodoro terminé", "Un livre de plus sur l'étagère. Pause !");
+      setMode(cycleDone > 0 && cycleDone % state.settings.every === 0 ? "long" : "short");
     } else {
-      notify("Pause terminée", "On rallume la lampe.");
+      if (!silent) notify("Pause terminée", "On rallume la lampe.");
       setMode("focus");
     }
   }
 
-  function logSession() {
-    const k = dayKey();
+  function logSession(at = new Date()) {
+    const k = dayKey(at);
     if (!state.days[k]) state.days[k] = { sessions: [] };
-    const now = new Date();
     state.days[k].sessions.push({
-      t: `${pad(now.getHours())}:${pad(now.getMinutes())}`,
+      t: `${pad(at.getHours())}:${pad(at.getMinutes())}`,
       min: state.settings.focus,
       subject: $("subject").value.trim()
     });
     save();
     renderScore();
   }
+
+  /* Passage à minuit : on remet les stats du jour à zéro sans recharger */
+  function checkDay() {
+    const k = dayKey();
+    if (k === currentDay) return;
+    currentDay = k;
+    cycleDone = 0;
+    renderCycle();
+    renderScore();
+    persistTimer();
+  }
+  setInterval(checkDay, 15000);
+  window.addEventListener("focus", checkDay);
+
+  /* Au chargement : on reprend exactement où tu en étais */
+  function restoreTimer() {
+    const t = state.timer;
+    cycleDone = t && t.day === currentDay ? (t.cycleDone || 0) : 0;
+    if (!t || !MODE_LABELS[t.mode]) { setMode("focus"); return; }
+    setMode(t.mode);
+    if (t.running) {
+      if (t.endAt > Date.now()) {
+        endAt = t.endAt;
+        remaining = endAt - Date.now();
+        runTicker();
+        persistTimer();
+      } else {
+        complete(t.endAt, true);
+      }
+    } else if (t.paused && t.remaining > 0) {
+      remaining = t.remaining;
+      paused = true;
+      $("startBtn").textContent = "Reprendre";
+      renderClock();
+      persistTimer();
+    }
+  }
+
+  const subjectInput = $("subject");
+  subjectInput.value = state.subject || "";
+  subjectInput.addEventListener("input", () => { state.subject = subjectInput.value; save(); });
+  document.addEventListener("pointerdown", ensureAudio, { once: true });
 
   $("startBtn").addEventListener("click", toggle);
   $("resetBtn").addEventListener("click", () => setMode(mode));
@@ -1013,7 +1071,7 @@
       toggle();
     }
   });
-  document.addEventListener("visibilitychange", () => { if (running) update(); });
+  document.addEventListener("visibilitychange", () => { checkDay(); if (running) update(); });
 
   document.querySelectorAll("[data-setting]").forEach(input => {
     const k = input.dataset.setting;
@@ -1343,7 +1401,7 @@
   });
 
   /* ---------- Démarrage ---------- */
-  setMode("focus");
+  restoreTimer();
   shuffleAll();
   renderImages();
   renderScore();
