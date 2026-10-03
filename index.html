@@ -1,1 +1,1356 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1E1510">
+<meta name="color-scheme" content="dark">
+<title>20/20</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏮</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Arimo:wght@400;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --room: #1E1510;
+    --wood: #2B1E16;
+    --wood-light: #3D2B1F;
+    --plank: #5A3E2A;
+    --amber: #E8863A;
+    --amber-deep: #9C4A1A;
+    --glow: #F6DFAF;
+    --lily: #F7F1E6;
+    --lily-pink: #EBC0B6;
+    --lily-pink-deep: #B8645A;
+    --stem: #8A9A6E;
+    --cream: #F1E6D4;
+    --muted: #BBA88F;
+    --ink-brown: #2A1D15;
+    --serif: "Newsreader", Georgia, "Times New Roman", serif;
+    --sans: "Arimo", "Helvetica Neue", Arial, sans-serif;
 
+    /* lanterne, mode focus */
+    --l1: #FFF7E6; --l2: #F7DFAE; --l3: #EDB878; --l4: #C98444;
+    --halo1: rgba(246, 200, 130, .38);
+    --halo2: rgba(232, 134, 58, .17);
+  }
+  body[data-mode="short"], body[data-mode="long"] {
+    /* lanterne rose lys pendant les pauses */
+    --l1: #FFF6F3; --l2: #F6DAD3; --l3: #E6AEA3; --l4: #C27C70;
+    --halo1: rgba(240, 195, 185, .32);
+    --halo2: rgba(215, 135, 125, .15);
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; background: var(--room); }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: var(--sans);
+    font-size: 1.0625rem;
+    line-height: 1.55;
+    color: var(--cream);
+    background:
+      repeating-linear-gradient(90deg, rgba(255, 235, 210, .014) 0 2px, transparent 2px 9px, rgba(0, 0, 0, .05) 9px 11px, transparent 11px 27px),
+      linear-gradient(180deg, #2E2017 0%, #22180F 45%, #1A120D 100%);
+  }
+
+  :focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; }
+  .paper :focus-visible { outline-color: var(--amber-deep); }
+
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+
+  main {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 24px 110px;
+  }
+
+  h2 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: clamp(1.7rem, 3vw, 2.2rem);
+    line-height: 1.15;
+    margin: 0;
+  }
+
+  /* Boutons */
+  .btn {
+    font: inherit;
+    font-size: 1rem;
+    padding: .6rem 1.2rem;
+    border-radius: 999px;
+    border: 1.5px solid #6B5440;
+    background: transparent;
+    color: var(--cream);
+    cursor: pointer;
+  }
+  .btn:hover { background: rgba(241, 230, 212, .07); border-color: var(--muted); }
+  .btn.primary {
+    background: var(--amber);
+    border-color: var(--amber);
+    color: #1B120C;
+    font-weight: 700;
+    min-width: 8rem;
+  }
+  .btn.primary:hover { background: #F09A55; border-color: #F09A55; }
+  .paper .btn { border-color: #B9A68E; color: var(--ink-brown); }
+  .paper .btn:hover { background: rgba(42, 29, 21, .06); border-color: var(--ink-brown); }
+  .paper .btn.primary { background: var(--ink-brown); border-color: var(--ink-brown); color: var(--lily); }
+  .paper .btn.primary:hover { background: #45311F; }
+  .link-btn {
+    font: inherit; font-size: .95rem;
+    background: none; border: 0; padding: 0;
+    color: inherit; opacity: .75;
+    text-decoration: underline; cursor: pointer;
+  }
+  .link-btn:hover { opacity: 1; }
+
+  .field {
+    width: 100%;
+    font: inherit;
+    color: var(--cream);
+    background: rgba(255, 240, 220, .04);
+    border: 0;
+    border-bottom: 1.5px solid #6B5440;
+    padding: .5rem .3rem;
+  }
+  .field:focus { border-bottom-color: var(--amber); }
+  .field::placeholder { color: #8E7C66; }
+  .paper .field { color: var(--ink-brown); background: rgba(255, 255, 255, .5); border-bottom-color: #CDB99E; }
+  .paper .field:focus { border-bottom-color: var(--ink-brown); }
+  .paper .field::placeholder { color: #9C8A74; }
+
+  /* Onglets */
+  .tabs { display: flex; flex-wrap: wrap; justify-content: center; gap: .25rem 1.4rem; }
+  .tab {
+    font: inherit;
+    font-size: 1rem;
+    background: none;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    padding: .3rem .1rem;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .tab:hover { color: var(--cream); }
+  .tab[aria-pressed="true"] { color: var(--cream); border-bottom-color: var(--amber); }
+  .paper .tab { color: #7A6652; }
+  .paper .tab:hover { color: var(--ink-brown); }
+  .paper .tab[aria-pressed="true"] { color: var(--ink-brown); border-bottom-color: var(--lily-pink-deep); }
+
+  /* ---------- La lampe ---------- */
+  .lamp-area {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding-bottom: 4.5rem;
+  }
+  .lamp-area::before {
+    content: "";
+    position: absolute;
+    left: 50%; top: 0;
+    width: min(1300px, 180vw);
+    height: 900px;
+    transform: translateX(-50%);
+    background: radial-gradient(ellipse 50% 45% at 50% 30%, var(--halo2), transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+    transition: opacity 1.4s ease;
+  }
+  .lamp-area > * { position: relative; z-index: 1; }
+  .lamp { display: flex; flex-direction: column; align-items: center; }
+  .cord { width: 2px; height: clamp(48px, 9vh, 96px); background: #0E0907; }
+  .lantern {
+    position: relative;
+    width: clamp(250px, 40vw, 360px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: .15rem;
+    color: #3A2213;
+    background:
+      repeating-linear-gradient(to bottom, rgba(140, 90, 40, .15) 0 1.5px, transparent 1.5px 13px),
+      radial-gradient(circle at 50% 42%, var(--l1) 0%, var(--l2) 42%, var(--l3) 78%, var(--l4) 100%);
+    box-shadow:
+      inset -18px -26px 60px rgba(120, 60, 20, .22),
+      0 0 60px 10px var(--halo1),
+      0 0 220px 70px var(--halo2);
+    filter: brightness(.86) saturate(.92);
+    transition: filter .9s ease, box-shadow .9s ease, background .9s ease;
+  }
+  .lantern::before {
+    content: "";
+    position: absolute;
+    top: -5px; left: 50%;
+    width: 16%; height: 10px;
+    transform: translateX(-50%);
+    border-radius: 3px;
+    background: #1A110C;
+  }
+  body.running .lantern {
+    filter: none;
+    box-shadow:
+      inset -18px -26px 60px rgba(120, 60, 20, .18),
+      0 0 80px 18px var(--halo1),
+      0 0 280px 100px var(--halo2);
+  }
+  /* allumage au chargement */
+  .lamp.off .lantern { filter: brightness(.3) saturate(.6); box-shadow: none; }
+  .lamp-area.off::before { opacity: 0; }
+
+  .lantern-mode { font-size: .9rem; color: #6B4325; }
+  .clock {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: clamp(3.4rem, 9vw, 5.3rem);
+    line-height: 1;
+    font-variant-numeric: tabular-nums lining-nums;
+    letter-spacing: -.01em;
+  }
+  .lantern-state { font-family: var(--serif); font-style: italic; font-size: 1rem; color: #6B4325; }
+
+  .progress {
+    width: min(240px, 60vw);
+    height: 3px;
+    margin-top: 2.2rem;
+    border-radius: 2px;
+    background: rgba(241, 230, 212, .12);
+    overflow: hidden;
+  }
+  .progress span {
+    display: block; height: 100%;
+    background: var(--amber);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform .25s linear;
+  }
+  body[data-mode="short"] .progress span,
+  body[data-mode="long"] .progress span { background: var(--lily-pink); }
+
+  .lamp-controls { width: 100%; max-width: 36rem; margin-top: 1.6rem; }
+  .mantra {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(1.25rem, 2.4vw, 1.5rem);
+    line-height: 1.35;
+    color: var(--glow);
+    min-height: 2rem;
+    margin: 1.2rem 0;
+  }
+  .controls { display: flex; flex-wrap: wrap; justify-content: center; gap: .6rem; margin: 1.2rem 0; }
+  .subject-row { text-align: left; max-width: 26rem; margin: 0 auto; }
+  .row-label { display: block; font-size: .9rem; color: var(--muted); }
+
+  .cycle { display: flex; justify-content: center; align-items: center; gap: .5rem; margin-top: 1.4rem; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid var(--muted); }
+  .dot.full { background: var(--amber); border-color: var(--amber); }
+  .cycle-label { font-size: .9rem; color: var(--muted); margin-left: .4rem; }
+
+  .settings { margin-top: 1.4rem; text-align: left; }
+  .settings summary { cursor: pointer; color: var(--muted); width: fit-content; margin: 0 auto; text-decoration: underline; }
+  .settings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 1rem 1.5rem;
+    margin-top: 1rem;
+    padding: 1.1rem 1.2rem;
+    border: 1px solid #4A3626;
+    border-radius: 10px;
+    background: rgba(20, 13, 9, .45);
+  }
+  .settings-grid label { display: flex; flex-direction: column; gap: .2rem; font-size: .92rem; color: var(--muted); }
+  .settings-grid .field { width: 6rem; }
+  .settings-grid .check { flex-direction: row; align-items: center; gap: .5rem; }
+  .settings-grid input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--amber); }
+  .hint { font-size: .88rem; color: #8E7C66; margin: 1rem 0 0; }
+
+  /* ---------- Le mur ---------- */
+  .wall { margin-bottom: 5rem; }
+  .section-head {
+    display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+    gap: .75rem 1.5rem; margin-bottom: 1.8rem;
+  }
+  .section-head p { margin: .3rem 0 0; color: var(--muted); }
+  .tiles {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.6rem;
+  }
+  .tile {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    container-type: inline-size;
+    display: flex;
+    overflow: hidden;
+    border-radius: 3px;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, .5), 0 2px 6px rgba(0, 0, 0, .35);
+  }
+  .tiles > :nth-child(4n+1) { transform: rotate(-1.4deg); }
+  .tiles > :nth-child(4n+2) { transform: rotate(1deg); }
+  .tiles > :nth-child(4n+3) { transform: rotate(-.6deg); }
+  .tiles > :nth-child(4n)   { transform: rotate(1.6deg); }
+
+  .tile-goal {
+    flex-direction: column;
+    padding: 1.3rem;
+    background:
+      radial-gradient(circle at 30% 20%, rgba(255, 230, 190, .55), transparent 60%),
+      var(--amber);
+    color: #2A160B;
+  }
+  .tile-goal label { font-size: .9rem; font-weight: 700; }
+  .tile-goal textarea {
+    flex: 1;
+    width: 100%;
+    margin-top: .5rem;
+    resize: none;
+    border: 0;
+    background: transparent;
+    color: #2A160B;
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 12cqi;
+    line-height: 1.08;
+  }
+  .tile-goal textarea::placeholder { color: rgba(42, 22, 11, .5); }
+  .tile-goal textarea:focus-visible { outline: 2px solid #2A160B; outline-offset: 4px; }
+  .tile-goal .goal-foot { font-family: var(--serif); font-style: italic; font-size: .95rem; margin: .5rem 0 0; }
+
+  button.tile {
+    font: inherit; border: 0; padding: 1.3rem;
+    text-align: inherit; cursor: pointer;
+  }
+  .qtext { margin: 0; width: 100%; }
+  .q-s .qtext { font-size: 21cqi; }
+  .q-m .qtext { font-size: 14.5cqi; }
+  .q-l .qtext { font-size: 10.5cqi; }
+
+  /* style « texte imprimé flou » */
+  .q-paper {
+    background: #ECEAE5;
+    color: #121212;
+    align-items: flex-start;
+  }
+  .q-paper .qtext {
+    font-family: var(--sans);
+    line-height: 1.02;
+    text-align: justify;
+    text-align-last: justify;
+    letter-spacing: -.01em;
+    text-shadow: 0 0 1.6px rgba(0, 0, 0, .45);
+  }
+  /* style « photo + texte jaune » */
+  .q-photo {
+    background:
+      radial-gradient(circle at 72% 26%, rgba(236, 196, 158, .85), transparent 45%),
+      radial-gradient(circle at 22% 78%, rgba(36, 20, 12, .92), transparent 55%),
+      radial-gradient(circle at 85% 88%, rgba(126, 74, 42, .85), transparent 50%),
+      linear-gradient(160deg, #7A5136, #3A2418);
+    color: #FFF14D;
+    align-items: center;
+    text-align: center;
+  }
+  .q-photo .qtext { text-align: center; font-family: var(--sans); line-height: 1.12; text-shadow: 0 1px 2px rgba(0, 0, 0, .35); }
+  /* style lys */
+  .q-lily {
+    background:
+      radial-gradient(circle at 75% 15%, rgba(255, 248, 240, .7), transparent 55%),
+      var(--lily-pink);
+    color: #3A1E18;
+    align-items: flex-end;
+  }
+  .q-lily .qtext { font-family: var(--serif); font-style: italic; line-height: 1.12; }
+
+  .tile-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .tile-del {
+    position: absolute; top: .5rem; right: .5rem;
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    border: 0;
+    background: rgba(20, 13, 9, .7);
+    color: var(--cream);
+    font-size: 1.2rem; line-height: 1;
+    cursor: pointer;
+  }
+  .tiles > .tile-add { aspect-ratio: auto; min-height: 150px; transform: none; }
+  .tile-add {
+    align-items: center; justify-content: center; text-align: center;
+    border: 1.5px dashed #6B5440;
+    box-shadow: none;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 1rem;
+  }
+  .tile-add:hover { color: var(--cream); border-color: var(--muted); }
+  .tile-add:focus-within { outline: 3px solid var(--amber); outline-offset: 3px; }
+
+  /* ---------- L'étagère ---------- */
+  .shelf-section { margin-bottom: 5rem; }
+  .score { font-family: var(--serif); line-height: 1; white-space: nowrap; }
+  .score-num { font-size: clamp(3.6rem, 8vw, 5rem); color: var(--glow); font-weight: 500; }
+  .score-den { font-size: clamp(1.8rem, 4vw, 2.4rem); color: var(--amber); font-style: italic; }
+  .prof-comment {
+    font-family: var(--serif); font-style: italic;
+    font-size: clamp(1.2rem, 2.2vw, 1.45rem);
+    color: var(--glow);
+    margin: .4rem 0 0;
+  }
+  .shelf {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    min-height: 168px;
+    padding: 18px 14px 0;
+    overflow-x: auto;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, .35), rgba(0, 0, 0, .12));
+    border-bottom: 14px solid var(--plank);
+    box-shadow: 0 14px 22px -8px rgba(0, 0, 0, .7);
+    border-radius: 4px 4px 0 0;
+  }
+  .book {
+    flex: none;
+    display: flex; align-items: center; justify-content: center;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-size: .7rem;
+    letter-spacing: .02em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: .6rem 0;
+    border-radius: 0 0 2px 2px;
+    box-shadow: inset 0 10px 0 -6px rgba(255, 255, 255, .18), inset 0 -10px 0 -6px rgba(0, 0, 0, .25);
+  }
+  .book.empty { background: transparent; border: 1.5px dashed rgba(241, 230, 212, .22); box-shadow: none; }
+  .shelf-meta { display: flex; flex-wrap: wrap; gap: .4rem 2rem; margin-top: 1.2rem; color: var(--muted); }
+  .shelf-meta .streak { color: var(--cream); }
+
+  /* ---------- Le bureau : bloc-notes + carnet ---------- */
+  .desk {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    align-items: start;
+  }
+  @media (min-width: 900px) {
+    .desk { grid-template-columns: minmax(0, 1fr) minmax(0, 1.55fr); }
+  }
+  .paper { color: var(--ink-brown); border-radius: 4px; box-shadow: 0 22px 45px rgba(0, 0, 0, .5); }
+  .paper h2 { margin-bottom: 1.2rem; }
+
+  .notepad {
+    background: #EFE5D3;
+    border-top: 22px solid #26201C;
+    padding: 1.6rem 1.5rem 1.8rem;
+  }
+  .todo-form { display: flex; gap: .6rem; }
+  .todos { list-style: none; padding: 0; margin: 1.2rem 0; }
+  .todos li {
+    display: flex; align-items: center; gap: .65rem;
+    padding: .45rem 0;
+    border-bottom: 1px solid #DDCDB4;
+  }
+  .todos input[type="checkbox"] { width: 19px; height: 19px; flex: none; accent-color: var(--stem); }
+  .todos label { cursor: pointer; }
+  .todos li.done label { color: #9C8A74; text-decoration: line-through; text-decoration-color: var(--lily-pink-deep); }
+  .del {
+    margin-left: auto;
+    background: none; border: 0;
+    font-size: 1.3rem; line-height: 1;
+    color: #9C8A74;
+    padding: .1rem .4rem;
+    cursor: pointer;
+  }
+  .del:hover { color: var(--lily-pink-deep); }
+  .empty { color: #9C8A74; }
+  .dark-empty { color: var(--muted); }
+
+  .notebook {
+    background:
+      linear-gradient(to right, transparent 46px, rgba(184, 100, 90, .5) 46px 48px, transparent 48px),
+      var(--lily);
+    padding: 1.8rem 1.6rem 2rem 70px;
+  }
+  .notebook .tabs { justify-content: flex-start; }
+  .prompt {
+    margin: 1.4rem 0 1rem;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(1.3rem, 2.3vw, 1.6rem);
+    line-height: 1.3;
+    color: var(--ink-brown);
+  }
+  #entry {
+    display: block;
+    width: 100%;
+    min-height: 256px;
+    resize: vertical;
+    font: 1.05rem/32px var(--sans);
+    color: var(--ink-brown);
+    padding: 0 .6rem;
+    border: 1px solid #DCCAB0;
+    border-radius: 4px;
+    background-color: #FBF7F0;
+    background-image: repeating-linear-gradient(to bottom, transparent 0 31px, #E6D7C2 31px 32px);
+    background-attachment: local;
+  }
+  #entry:focus { border-color: var(--ink-brown); }
+  .notebook .controls { justify-content: flex-start; }
+  .status { min-height: 1.5rem; margin: 0; font-weight: 700; color: var(--lily-pink-deep); }
+  .notebook h3 { font-family: var(--serif); font-weight: 500; font-size: 1.3rem; margin: 2rem 0 .5rem; }
+  .entry { border-top: 1px solid #E2D2BB; padding: .65rem 0; }
+  .entry summary { cursor: pointer; }
+  .entry-date { font-weight: 700; }
+  .entry-prompt { display: block; font-family: var(--serif); font-style: italic; color: #7A6652; }
+  .entry-text { white-space: pre-wrap; margin: .75rem 0; }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 900px) {
+    .tiles { grid-template-columns: repeat(2, 1fr); gap: 1.2rem; }
+  }
+  @media (max-width: 480px) {
+    main { padding: 0 16px 80px; }
+    .tiles { grid-template-columns: 1fr; }
+    .tile { aspect-ratio: 1; }
+    .notebook { padding-left: 52px; background: linear-gradient(to right, transparent 32px, rgba(184, 100, 90, .5) 32px 34px, transparent 34px), var(--lily); }
+    .todo-form { flex-direction: column; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lantern, .lamp-area::before, .progress span { transition: none; }
+  }
+</style>
+</head>
+<body data-mode="focus">
+<main>
+  <h1 class="sr-only">20/20</h1>
+
+  <!-- La lampe = le chrono -->
+  <section class="lamp-area off" id="lampArea" aria-labelledby="h-focus">
+    <h2 id="h-focus" class="sr-only">Chrono pomodoro</h2>
+    <div class="lamp off" id="lamp">
+      <span class="cord" aria-hidden="true"></span>
+      <div class="lantern">
+        <span class="lantern-mode" id="lanternMode">Focus</span>
+        <div class="clock" id="clock">25:00</div>
+        <span class="lantern-state" id="lanternState">appuie sur Lancer</span>
+      </div>
+    </div>
+    <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
+
+    <div class="lamp-controls">
+      <div class="tabs" role="group" aria-label="Type de séance">
+        <button class="tab mode" data-mode="focus" aria-pressed="true">Focus</button>
+        <button class="tab mode" data-mode="short" aria-pressed="false">Pause courte</button>
+        <button class="tab mode" data-mode="long" aria-pressed="false">Pause longue</button>
+      </div>
+
+      <p class="mantra" id="mantra"></p>
+
+      <div class="subject-row">
+        <label for="subject" class="row-label">Je bosse sur</label>
+        <input id="subject" class="field" type="text" autocomplete="off" placeholder="Réduction des endomorphismes">
+      </div>
+
+      <div class="controls">
+        <button id="startBtn" class="btn primary">Lancer</button>
+        <button id="resetBtn" class="btn">Recommencer</button>
+        <button id="skipBtn" class="btn">Passer</button>
+      </div>
+
+      <div class="cycle" id="cycle"></div>
+
+      <details class="settings">
+        <summary>Réglages</summary>
+        <div class="settings-grid">
+          <label>Focus (min)<input class="field" type="number" min="1" max="180" data-setting="focus"></label>
+          <label>Pause courte (min)<input class="field" type="number" min="1" max="60" data-setting="short"></label>
+          <label>Pause longue (min)<input class="field" type="number" min="1" max="90" data-setting="long"></label>
+          <label>Pomodoros avant la pause longue<input class="field" type="number" min="1" max="12" data-setting="every"></label>
+          <label>Pomodoros visés par jour<input class="field" type="number" min="1" max="30" data-setting="goal"></label>
+          <label class="check"><input type="checkbox" id="setSound"> Son à la fin</label>
+        </div>
+      </details>
+      <p class="hint">Barre d'espace pour lancer ou mettre en pause.</p>
+    </div>
+  </section>
+
+  <!-- Le mur de motivation -->
+  <section class="wall" aria-labelledby="h-wall">
+    <div class="section-head">
+      <div>
+        <h2 id="h-wall">Le mur</h2>
+        <p>Clique sur une citation pour en tirer une autre. Ajoute tes images Pinterest.</p>
+      </div>
+      <button id="shuffle" class="btn">Nouvelles citations</button>
+    </div>
+    <div class="tiles" id="tiles">
+      <div class="tile tile-goal">
+        <label for="objective">Mon objectif</label>
+        <textarea id="objective" placeholder="20/20 au prochain DS de maths"></textarea>
+        <p class="goal-foot">Écris-le au présent, comme si c'était fait.</p>
+      </div>
+      <button class="tile quote q-paper" data-slot="0" aria-label="Tirer une autre citation"><blockquote class="qtext"></blockquote></button>
+      <button class="tile quote q-photo" data-slot="1" aria-label="Tirer une autre citation"><blockquote class="qtext"></blockquote></button>
+      <button class="tile quote q-lily" data-slot="2" aria-label="Tirer une autre citation"><blockquote class="qtext"></blockquote></button>
+      <label class="tile tile-add" id="addTile">
+        <input type="file" accept="image/*" multiple class="sr-only" id="imgInput">
+        <span>+ Ajouter une image</span>
+      </label>
+    </div>
+    <p class="status" id="wallMsg" role="status" style="color: var(--glow); margin-top: 1rem;"></p>
+  </section>
+
+  <!-- L'étagère = la note du jour -->
+  <section class="shelf-section" aria-labelledby="h-shelf">
+    <div class="section-head">
+      <div>
+        <h2 id="h-shelf">Ta note du jour</h2>
+        <p class="prof-comment" id="profComment"></p>
+      </div>
+      <div class="score" aria-live="polite"><span class="score-num" id="score">0</span><span class="score-den">/20</span></div>
+    </div>
+    <div class="shelf" id="shelf" aria-label="Pomodoros terminés aujourd'hui"></div>
+    <div class="shelf-meta">
+      <span id="scoreDetail"></span>
+      <span class="streak" id="streak"></span>
+    </div>
+  </section>
+
+  <!-- Le bureau -->
+  <div class="desk">
+    <section class="paper notepad" aria-labelledby="h-todo">
+      <h2 id="h-todo">Au programme</h2>
+      <form id="todoForm" class="todo-form">
+        <label for="todoInput" class="sr-only">Nouvelle tâche</label>
+        <input id="todoInput" class="field" type="text" autocomplete="off" placeholder="3 exos de la feuille 7">
+        <button class="btn" type="submit">Ajouter</button>
+      </form>
+      <ul class="todos" id="todoList"></ul>
+      <button class="link-btn" id="clearDone" type="button">Effacer les tâches cochées</button>
+    </section>
+
+    <section class="paper notebook" aria-labelledby="h-journal">
+      <h2 id="h-journal">Journal</h2>
+      <div class="tabs" role="group" aria-label="Type de sujet">
+        <button class="tab cat" data-cat="matin" aria-pressed="true">Matin</button>
+        <button class="tab cat" data-cat="manif" aria-pressed="false">Manifestation</button>
+        <button class="tab cat" data-cat="soir" aria-pressed="false">Bilan du soir</button>
+        <button class="tab cat" data-cat="blocage" aria-pressed="false">Blocage</button>
+        <button class="tab cat" data-cat="perso" aria-pressed="false">Dév perso</button>
+      </div>
+
+      <p class="prompt" id="prompt"></p>
+      <div class="controls"><button id="newPrompt" class="btn">Autre sujet</button></div>
+
+      <label for="entry" class="sr-only">Ta réponse</label>
+      <textarea id="entry" placeholder="Écris ici, sans te censurer."></textarea>
+
+      <div class="controls">
+        <button id="saveEntry" class="btn primary">Enregistrer</button>
+        <button id="exportBtn" class="btn">Exporter en .txt</button>
+      </div>
+      <p class="status" id="saveMsg" role="status"></p>
+
+      <h3>Pages précédentes</h3>
+      <div id="entries"></div>
+    </section>
+  </div>
+</main>
+
+<script>
+(() => {
+  /* ---------- Données ---------- */
+  const KEY = "vingt-sur-vingt-v1";
+  const DEFAULTS = {
+    settings: { focus: 25, short: 5, long: 15, every: 4, goal: 8, sound: true },
+    objective: "",
+    days: {},
+    todos: [],
+    journal: [],
+    images: [],
+    draft: "",
+    cat: "matin",
+    prompt: ""
+  };
+
+  let state;
+  try {
+    const saved = JSON.parse(localStorage.getItem(KEY)) || {};
+    state = Object.assign(JSON.parse(JSON.stringify(DEFAULTS)), saved);
+    state.settings = Object.assign({}, DEFAULTS.settings, saved.settings || {});
+  } catch (e) {
+    state = JSON.parse(JSON.stringify(DEFAULTS));
+  }
+  const save = () => {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); return true; }
+    catch (e) { return false; }
+  };
+
+  const $ = id => document.getElementById(id);
+  const pad = n => String(n).padStart(2, "0");
+  const dayKey = (d = new Date()) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const todayData = () => state.days[dayKey()] || { sessions: [] };
+  const plural = (n, word) => `${n} ${word}${n > 1 ? "s" : ""}`;
+  const pickFrom = (arr, avoid = []) => {
+    const pool = arr.filter(x => !avoid.includes(x));
+    const src = pool.length ? pool : arr;
+    return src[Math.floor(Math.random() * src.length)];
+  };
+
+  /* ---------- Textes ---------- */
+  const QUOTES = [
+    "study like your future self is watching",
+    "quiet room. loud ambition.",
+    "discipline is a love letter to your future self",
+    "satisfy your future, not your phone.",
+    "the lamp is on. so are you.",
+    "no one is coming to do it for you. open the book.",
+    "soft life later. focus now.",
+    "be so prepared that luck feels optional",
+    "20/20 is a habit, not a miracle",
+    "read the chapter. then read it again.",
+    "romanticise the work, not just the results",
+    "small hours, big results",
+    "lock in.",
+    "Tu ne bosses pas pour le DS. Tu bosses pour la personne que tu deviens.",
+    "Ferme les onglets. Ouvre le cours.",
+    "Le 20 se prépare en silence.",
+    "Un chapitre de plus, une excuse de moins.",
+    "Personne ne verra ces heures. Tout le monde verra le résultat.",
+    "La motivation passe, la routine reste.",
+    "Calme dehors, ambition dedans."
+  ];
+
+  const FOCUS_LINES = [
+    "Chaque pomodoro, c'est un livre de plus sur l'étagère.",
+    "Pas besoin d'envie. Juste la ligne suivante.",
+    "Le 20/20 se gagne aujourd'hui, pas le jour du DS.",
+    "Téléphone retourné. Cerveau allumé.",
+    "Une démonstration à la fois.",
+    "25 minutes, c'est court. Rends-les denses.",
+    "Le chrono tourne pour toi, pas contre toi.",
+    "Écris, calcule, vérifie. Recommence."
+  ];
+  const PAUSE_LINES = [
+    "Lève-toi, bois de l'eau, regarde loin.",
+    "Pause méritée. Sans écran si possible.",
+    "Un thé, une fenêtre, trois respirations.",
+    "Étire-toi, le cerveau a besoin d'oxygène."
+  ];
+
+  const PROMPTS = {
+    matin: [
+      "Quelle est la seule chose qui, faite aujourd'hui, rendrait la journée réussie ?",
+      "Quel chapitre veux-tu maîtriser ce soir, et comment sauras-tu que c'est le cas ?",
+      "Écris ton planning de la journée en trois blocs. Qu'est-ce qui passe en premier ?",
+      "Qu'est-ce qui risque de te faire perdre du temps aujourd'hui ? Comment tu l'évites ?",
+      "Quel théorème ou quelle méthode veux-tu savoir réciter sans notes d'ici ce soir ?",
+      "Dans quel état d'esprit veux-tu attaquer ta première séance ? Décris-le en une phrase.",
+      "Si tu ne faisais que 4 pomodoros aujourd'hui, lesquels choisirais-tu ?",
+      "Qu'est-ce que la version de toi qui a 20/20 ferait différemment ce matin ?",
+      "De quoi as-tu besoin (sommeil, eau, silence, matériel) pour bosser à fond aujourd'hui ?",
+      "Quel exercice d'hier mérite d'être refait à froid ce matin ?"
+    ],
+    manif: [
+      "Décris la scène où tu récupères ta copie notée 20/20 : où es-tu, que dit le prof, que ressens-tu ?",
+      "Complète au présent, comme si c'était déjà vrai : « Je suis quelqu'un qui… »",
+      "Écris la lettre que la version de toi de l'an prochain t'envoie après les résultats.",
+      "Donne trois preuves concrètes que tu es capable d'avoir 20/20.",
+      "Décris ta journée idéale dans la peau de quelqu'un qui réussit tout, du réveil au coucher.",
+      "Qu'est-ce qui change dans ta vie le jour où tu atteins ton objectif ?",
+      "Quelle croyance sur toi-même dois-tu lâcher pour viser le 20 ?",
+      "Écris ce que ton prof note dans la marge de ta copie parfaite.",
+      "Imagine le jour de l'épreuve : tu lis le sujet et tu sais exactement quoi faire. Raconte la suite.",
+      "Où seras-tu dans cinq ans grâce au travail de cette année ?",
+      "Écris ton objectif en une phrase, au présent, et recopie-la trois fois."
+    ],
+    soir: [
+      "Qu'as-tu compris aujourd'hui que tu ne comprenais pas hier ?",
+      "Note ta journée sur 20. Qu'est-ce qui t'a coûté des points ?",
+      "Quelle erreur as-tu faite aujourd'hui, et quelle règle en tires-tu pour la prochaine fois ?",
+      "À quel moment de la journée as-tu été le plus efficace ? Pourquoi ?",
+      "Explique en trois lignes, sans notes, la notion la plus dure vue aujourd'hui.",
+      "Qu'est-ce que tu as remis à demain ? Est-ce que c'était un vrai choix ?",
+      "Trois choses réussies aujourd'hui, même petites.",
+      "Qu'est-ce que tu attaques demain en premier, à la première heure ?",
+      "Si tu faisais une fiche de ta journée en cinq lignes, que contiendrait-elle ?",
+      "Quelle séance d'aujourd'hui mérite un 20/20 ? Qu'est-ce qui l'a rendue si bonne ?"
+    ],
+    blocage: [
+      "Quel exercice t'a résisté ? Écris précisément l'étape où tu as bloqué.",
+      "Qu'est-ce qui te fait procrastiner en ce moment ? Sois honnête.",
+      "Écris tout ce qui t'encombre la tête, sans filtre, pendant cinq minutes.",
+      "Quelle est la plus petite action possible pour te remettre au travail maintenant ?",
+      "Qu'est-ce que tu dirais à quelqu'un de ta classe qui se sent exactement comme toi ?",
+      "Ce que tu redoutes dans le prochain DS : écris le pire scénario, puis ce que tu ferais concrètement.",
+      "Quelle mauvaise note passée t'a finalement appris quelque chose ? Quoi ?",
+      "Liste ce qui dépend de toi cette semaine, et ce qui n'en dépend pas.",
+      "Quand as-tu déjà réussi un truc qui semblait impossible au départ ?",
+      "Reformule ton blocage en question : « Comment pourrais-je… ? »"
+    ],
+    perso: [
+      "Quelle habitude, si tu la tenais pendant un an, changerait le plus ta vie ?",
+      "Qu'est-ce que tu fais par peur du regard des autres plutôt que par envie ?",
+      "Quelles sont tes trois valeurs les plus importantes ? Est-ce que ta semaine les reflète vraiment ?",
+      "De quoi as-tu besoin d'arrêter de te justifier ?",
+      "Qu'est-ce qui te donne de l'énergie, et qu'est-ce qui t'en vole ? Fais deux listes.",
+      "Quelle conversation évites-tu en ce moment ? Qu'est-ce qui te retient ?",
+      "Qu'est-ce que tu as appris sur toi-même ce mois-ci ?",
+      "Quelle limite as-tu besoin de poser, et avec qui ?",
+      "Si tu n'avais peur de rien, que ferais-tu différemment cette année ?",
+      "Quel compliment as-tu du mal à accepter ? Pourquoi ?",
+      "Qu'est-ce que tu te reproches encore et que tu pourrais te pardonner aujourd'hui ?",
+      "Quelles personnes te tirent vers le haut ? Passes-tu assez de temps avec elles ?",
+      "Qu'as-tu accompli récemment, en dehors des notes, qui mérite d'être reconnu ?",
+      "Comment te parles-tu quand tu échoues ? Réécris ce discours comme le ferait quelqu'un qui t'aime.",
+      "Quel est ton rapport au repos ? Est-ce que tu culpabilises quand tu ne fais rien ?",
+      "Quelle petite promesse peux-tu te faire aujourd'hui et tenir à coup sûr ?",
+      "Que veut dire « réussir » pour toi, en dehors de ce qu'on attend de toi ?",
+      "Quel défaut chez les autres t'agace le plus ? Qu'est-ce qu'il dit de toi ?",
+      "Quelle compétence hors des cours aimerais-tu développer ? Quel premier pas cette semaine ?",
+      "Quelle croyance héritée de ton enfance ne te sert plus aujourd'hui ?",
+      "Décris un moment récent où tu étais pleinement toi-même. Qu'est-ce qui le rendait possible ?",
+      "Qu'est-ce que tu consommes (réseaux, contenus, conversations) qui te tire vers le bas ?",
+      "Si ta vie actuelle était un chapitre de livre, quel en serait le titre ? Et celui du suivant ?",
+      "Qu'est-ce que tu aimerais qu'on dise de toi quand tu n'es pas dans la pièce ?",
+      "Quand as-tu quitté ta zone de confort pour la dernière fois ? Qu'est-ce que ça t'a appris ?",
+      "Écris une lettre à toi dans dix ans : ce que tu espères, ce que tu crains, ce que tu promets.",
+      "Qu'est-ce que tu fais en pilote automatique et que tu aimerais faire en conscience ?",
+      "Quelle routine du soir t'aiderait à mieux dormir et mieux démarrer demain ?",
+      "Qu'est-ce que tu repousses depuis des mois ? Quel est le vrai obstacle ?",
+      "Quelle partie de toi as-tu mise de côté pour les études ? Comment lui faire un peu de place ?"
+    ]
+  };
+  const CAT_LABELS = { matin: "Matin", manif: "Manifestation", soir: "Bilan du soir", blocage: "Blocage", perso: "Dév perso" };
+  const MODE_LABELS = { focus: "Focus", short: "Pause courte", long: "Pause longue" };
+
+  /* ---------- Allumage de la lampe ---------- */
+  requestAnimationFrame(() => setTimeout(() => {
+    $("lamp").classList.remove("off");
+    $("lampArea").classList.remove("off");
+  }, 250));
+
+  /* ---------- Son & notifications ---------- */
+  let actx = null;
+  function ensureAudio() {
+    try {
+      actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+      if (actx.state === "suspended") actx.resume();
+    } catch (e) {}
+  }
+  function ding() {
+    if (!state.settings.sound || !actx) return;
+    const now = actx.currentTime;
+    [659.25, 783.99, 987.77].forEach((freq, i) => {
+      const t = now + i * 0.24;
+      const o = actx.createOscillator();
+      const g = actx.createGain();
+      o.type = "sine";
+      o.frequency.value = freq;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.22, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.6);
+      o.connect(g).connect(actx.destination);
+      o.start(t);
+      o.stop(t + 0.65);
+    });
+  }
+  function notify(title, body) {
+    if (!("Notification" in window) || Notification.permission !== "granted" || !document.hidden) return;
+    try { new Notification(title, { body }); } catch (e) {}
+  }
+
+  /* ---------- Chrono ---------- */
+  let mode = "focus";
+  let running = false;
+  let paused = false;
+  let endAt = 0;
+  let timer = null;
+  let cycleDone = 0;
+  const duration = m => state.settings[m] * 60000;
+  let remaining = duration(mode);
+
+  const fmt = ms => {
+    const s = Math.max(0, Math.ceil(ms / 1000));
+    return `${pad(Math.floor(s / 60))}:${pad(s % 60)}`;
+  };
+
+  function renderClock() {
+    const t = fmt(remaining);
+    $("clock").textContent = t;
+    const p = Math.min(1, Math.max(0, 1 - remaining / duration(mode)));
+    $("progressBar").style.transform = `scaleX(${p})`;
+    document.title = running ? `${t} – ${MODE_LABELS[mode]}` : "20/20";
+    $("lanternState").textContent = running
+      ? (mode === "focus" ? "concentration" : "on souffle")
+      : (paused ? "en pause" : "appuie sur Lancer");
+    document.body.classList.toggle("running", running);
+  }
+
+  function renderCycle() {
+    const every = state.settings.every;
+    let filled = cycleDone % every;
+    if (filled === 0 && cycleDone > 0 && mode === "long") filled = every;
+    const box = $("cycle");
+    box.innerHTML = "";
+    for (let i = 0; i < every; i++) {
+      const d = document.createElement("span");
+      d.className = "dot" + (i < filled ? " full" : "");
+      box.appendChild(d);
+    }
+    const lbl = document.createElement("span");
+    lbl.className = "cycle-label";
+    lbl.textContent = `${filled} sur ${every} avant la pause longue`;
+    box.appendChild(lbl);
+  }
+
+  function setMantra() {
+    $("mantra").textContent = pickFrom(mode === "focus" ? FOCUS_LINES : PAUSE_LINES, [$("mantra").textContent]);
+  }
+
+  function setMode(m) {
+    stop();
+    paused = false;
+    mode = m;
+    remaining = duration(m);
+    document.body.dataset.mode = m;
+    $("lanternMode").textContent = MODE_LABELS[m];
+    document.querySelectorAll(".mode").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.mode === m)));
+    $("startBtn").textContent = "Lancer";
+    setMantra();
+    renderClock();
+    renderCycle();
+  }
+
+  function start() {
+    if (running) return;
+    ensureAudio();
+    if ("Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission().catch(() => {});
+    }
+    if (remaining <= 0) remaining = duration(mode);
+    endAt = Date.now() + remaining;
+    running = true;
+    paused = false;
+    timer = setInterval(update, 250);
+    $("startBtn").textContent = "Pause";
+    renderClock();
+  }
+
+  function stop() {
+    clearInterval(timer);
+    timer = null;
+    running = false;
+  }
+
+  function pause() {
+    if (!running) return;
+    remaining = endAt - Date.now();
+    stop();
+    paused = true;
+    $("startBtn").textContent = "Reprendre";
+    renderClock();
+  }
+
+  const toggle = () => (running ? pause() : start());
+
+  function update() {
+    remaining = endAt - Date.now();
+    if (remaining <= 0) complete();
+    else renderClock();
+  }
+
+  function complete() {
+    stop();
+    remaining = 0;
+    ding();
+    if (mode === "focus") {
+      logSession();
+      cycleDone++;
+      notify("Pomodoro terminé", "Un livre de plus sur l'étagère. Pause !");
+      setMode(cycleDone % state.settings.every === 0 ? "long" : "short");
+    } else {
+      notify("Pause terminée", "On rallume la lampe.");
+      setMode("focus");
+    }
+  }
+
+  function logSession() {
+    const k = dayKey();
+    if (!state.days[k]) state.days[k] = { sessions: [] };
+    const now = new Date();
+    state.days[k].sessions.push({
+      t: `${pad(now.getHours())}:${pad(now.getMinutes())}`,
+      min: state.settings.focus,
+      subject: $("subject").value.trim()
+    });
+    save();
+    renderScore();
+  }
+
+  $("startBtn").addEventListener("click", toggle);
+  $("resetBtn").addEventListener("click", () => setMode(mode));
+  $("skipBtn").addEventListener("click", () => {
+    setMode(mode === "focus" ? ((cycleDone + 1) % state.settings.every === 0 ? "long" : "short") : "focus");
+  });
+  document.querySelectorAll(".mode").forEach(b => b.addEventListener("click", () => setMode(b.dataset.mode)));
+
+  document.addEventListener("keydown", e => {
+    const tag = e.target.tagName;
+    if (e.code === "Space" && !["INPUT", "TEXTAREA", "SELECT", "BUTTON", "SUMMARY", "LABEL"].includes(tag)) {
+      e.preventDefault();
+      toggle();
+    }
+  });
+  document.addEventListener("visibilitychange", () => { if (running) update(); });
+
+  document.querySelectorAll("[data-setting]").forEach(input => {
+    const k = input.dataset.setting;
+    input.value = state.settings[k];
+    input.addEventListener("change", () => {
+      const min = Number(input.min), max = Number(input.max);
+      let v = parseInt(input.value, 10);
+      if (Number.isNaN(v)) v = DEFAULTS.settings[k];
+      v = Math.min(max, Math.max(min, v));
+      input.value = v;
+      state.settings[k] = v;
+      save();
+      if (!running && !paused && k === mode) { remaining = duration(mode); renderClock(); }
+      renderCycle();
+      renderScore();
+    });
+  });
+  const soundBox = $("setSound");
+  soundBox.checked = state.settings.sound;
+  soundBox.addEventListener("change", () => { state.settings.sound = soundBox.checked; save(); });
+
+  /* ---------- Le mur ---------- */
+  const objective = $("objective");
+  objective.value = state.objective;
+  objective.addEventListener("input", () => { state.objective = objective.value; save(); });
+
+  const quoteTiles = [...document.querySelectorAll(".quote")];
+  const sizeClass = q => (q.length <= 28 ? "q-s" : q.length <= 60 ? "q-m" : "q-l");
+
+  function setQuote(tile, q) {
+    tile.classList.remove("q-s", "q-m", "q-l");
+    tile.classList.add(sizeClass(q));
+    tile.querySelector(".qtext").textContent = q;
+  }
+  const shownQuotes = () => quoteTiles.map(t => t.querySelector(".qtext").textContent);
+
+  function shuffleAll() {
+    const used = [];
+    quoteTiles.forEach(t => {
+      const q = pickFrom(QUOTES, used.concat(shownQuotes()));
+      used.push(q);
+      setQuote(t, q);
+    });
+  }
+  quoteTiles.forEach(t => t.addEventListener("click", () => setQuote(t, pickFrom(QUOTES, shownQuotes()))));
+  $("shuffle").addEventListener("click", shuffleAll);
+
+  let wallTimeout;
+  function wallMsg(msg) {
+    $("wallMsg").textContent = msg;
+    clearTimeout(wallTimeout);
+    wallTimeout = setTimeout(() => { $("wallMsg").textContent = ""; }, 4000);
+  }
+
+  function compressImage(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = reject;
+      reader.onload = () => {
+        const img = new Image();
+        img.onerror = reject;
+        img.onload = () => {
+          const max = 900;
+          const scale = Math.min(1, max / Math.max(img.width, img.height));
+          const c = document.createElement("canvas");
+          c.width = Math.round(img.width * scale);
+          c.height = Math.round(img.height * scale);
+          c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+          resolve(c.toDataURL("image/jpeg", 0.82));
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function renderImages() {
+    document.querySelectorAll(".tile-img").forEach(n => n.remove());
+    const addTile = $("addTile");
+    state.images.forEach(im => {
+      const fig = document.createElement("figure");
+      fig.className = "tile tile-img";
+      fig.style.margin = "0";
+      const img = document.createElement("img");
+      img.src = im.src;
+      img.alt = "Image de ton mur de motivation";
+      const del = document.createElement("button");
+      del.className = "tile-del";
+      del.type = "button";
+      del.textContent = "×";
+      del.setAttribute("aria-label", "Retirer cette image du mur");
+      del.addEventListener("click", () => {
+        state.images = state.images.filter(x => x.id !== im.id);
+        save(); renderImages();
+      });
+      fig.append(img, del);
+      addTile.before(fig);
+    });
+  }
+
+  $("imgInput").addEventListener("change", async e => {
+    const files = [...e.target.files];
+    e.target.value = "";
+    for (const f of files) {
+      if (state.images.length >= 12) { wallMsg("Le mur est plein : 12 images maximum. Retires-en une pour en ajouter."); break; }
+      try {
+        const src = await compressImage(f);
+        state.images.push({ id: Date.now() + Math.random(), src });
+        if (!save()) {
+          state.images.pop();
+          wallMsg("Plus de place dans le navigateur pour cette image. Retires-en une autre d'abord.");
+          break;
+        }
+      } catch (err) {
+        wallMsg("Cette image n'a pas pu être lue. Essaie un fichier JPG ou PNG.");
+      }
+    }
+    renderImages();
+  });
+
+  /* ---------- L'étagère ---------- */
+  const BOOKS = [
+    ["#A4302A", "#F6E9DA"], ["#E9E1D0", "#2A1D15"], ["#1F1A17", "#E9DCC8"],
+    ["#E8863A", "#2A160B"], ["#6E7B5A", "#F3EEDF"], ["#EBC0B6", "#3A1E18"],
+    ["#3C4A63", "#EFE7DA"], ["#C9A66B", "#2A1D15"], ["#7A2E2A", "#F1E2D0"]
+  ];
+
+  function profComment(s) {
+    if (s === 0) return "Étagère vide pour l'instant. Allume la lampe.";
+    if (s < 8) return "Les premiers livres sont posés. Continue.";
+    if (s < 12) return "Ça se construit, garde le rythme.";
+    if (s < 16) return "Belle étagère. Encore un effort.";
+    if (s < 20) return "Très bien. Le 20 est à portée de main.";
+    return "20/20. Journée parfaite, tu peux être fier·e de toi.";
+  }
+
+  function streak() {
+    const has = d => ((state.days[dayKey(d)] || {}).sessions || []).length > 0;
+    const d = new Date();
+    if (!has(d)) d.setDate(d.getDate() - 1);
+    let n = 0;
+    while (has(d)) { n++; d.setDate(d.getDate() - 1); }
+    return n;
+  }
+
+  function renderScore() {
+    const sessions = todayData().sessions;
+    const done = sessions.length;
+    const goal = state.settings.goal;
+    const minutes = sessions.reduce((a, s) => a + (s.min || 0), 0);
+    const score = Math.min(20, Math.round((done / goal) * 20 * 2) / 2);
+
+    $("score").textContent = String(score).replace(".", ",");
+    $("profComment").textContent = profComment(score);
+    $("scoreDetail").textContent = `${plural(done, "pomodoro")} sur ${goal}, soit ${minutes} min de travail.`;
+    const n = streak();
+    $("streak").textContent = n === 0
+      ? "Pas encore de série. Un pomodoro aujourd'hui suffit à la lancer."
+      : `Série en cours : ${plural(n, "jour")} d'affilée.`;
+
+    const shelf = $("shelf");
+    shelf.innerHTML = "";
+    const slots = Math.max(goal, done);
+    for (let i = 0; i < slots; i++) {
+      const b = document.createElement("span");
+      const h = 112 + ((i * 37) % 34);
+      const w = 26 + ((i * 13) % 12);
+      b.style.height = h + "px";
+      b.style.width = w + "px";
+      if (i < done) {
+        const s = sessions[i];
+        const [bg, fg] = BOOKS[(i * 5 + 2) % BOOKS.length];
+        b.className = "book";
+        b.style.background = bg;
+        b.style.color = fg;
+        b.textContent = s.subject || "focus";
+        b.title = `${s.t} : ${s.subject || "Séance de focus"} (${s.min} min)`;
+      } else {
+        b.className = "book empty";
+        b.setAttribute("aria-hidden", "true");
+      }
+      shelf.appendChild(b);
+    }
+  }
+
+  /* ---------- Au programme ---------- */
+  function renderTodos() {
+    const list = $("todoList");
+    list.innerHTML = "";
+    if (!state.todos.length) {
+      const li = document.createElement("li");
+      li.className = "empty";
+      li.textContent = "Rien au programme. Ajoute ce que tu veux boucler aujourd'hui.";
+      list.appendChild(li);
+      return;
+    }
+    state.todos.forEach(t => {
+      const li = document.createElement("li");
+      if (t.done) li.className = "done";
+      const cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.id = "todo-" + t.id;
+      cb.checked = t.done;
+      cb.addEventListener("change", () => { t.done = cb.checked; save(); renderTodos(); });
+      const label = document.createElement("label");
+      label.htmlFor = cb.id;
+      label.textContent = t.text;
+      const del = document.createElement("button");
+      del.className = "del";
+      del.type = "button";
+      del.textContent = "×";
+      del.setAttribute("aria-label", `Supprimer « ${t.text} »`);
+      del.addEventListener("click", () => {
+        state.todos = state.todos.filter(x => x.id !== t.id);
+        save(); renderTodos();
+      });
+      li.append(cb, label, del);
+      list.appendChild(li);
+    });
+  }
+  $("todoForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const input = $("todoInput");
+    const text = input.value.trim();
+    if (!text) return;
+    state.todos.push({ id: Date.now(), text, done: false });
+    input.value = "";
+    save(); renderTodos();
+  });
+  $("clearDone").addEventListener("click", () => {
+    state.todos = state.todos.filter(t => !t.done);
+    save(); renderTodos();
+  });
+
+  /* ---------- Journal ---------- */
+  const entry = $("entry");
+  entry.value = state.draft || "";
+  entry.addEventListener("input", () => { state.draft = entry.value; save(); });
+
+  function setCat(cat, keepPrompt) {
+    state.cat = cat;
+    document.querySelectorAll(".cat").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.cat === cat)));
+    if (!keepPrompt || !PROMPTS[cat].includes(state.prompt)) {
+      state.prompt = pickFrom(PROMPTS[cat], [state.prompt]);
+    }
+    $("prompt").textContent = state.prompt;
+    save();
+  }
+  document.querySelectorAll(".cat").forEach(b => b.addEventListener("click", () => setCat(b.dataset.cat)));
+  $("newPrompt").addEventListener("click", () => setCat(state.cat));
+
+  let msgTimeout;
+  function flash(msg) {
+    $("saveMsg").textContent = msg;
+    clearTimeout(msgTimeout);
+    msgTimeout = setTimeout(() => { $("saveMsg").textContent = ""; }, 3500);
+  }
+
+  $("saveEntry").addEventListener("click", () => {
+    const text = entry.value.trim();
+    if (!text) { flash("Écris quelque chose avant d'enregistrer."); entry.focus(); return; }
+    state.journal.unshift({ id: Date.now(), date: new Date().toISOString(), cat: state.cat, prompt: state.prompt, text });
+    entry.value = "";
+    state.draft = "";
+    if (!save()) { flash("Plus de place dans le navigateur. Exporte ton journal puis retire quelques images du mur."); return; }
+    flash("Page enregistrée.");
+    renderEntries();
+    setCat(state.cat);
+  });
+
+  const fmtDate = iso => new Date(iso).toLocaleDateString("fr-FR", {
+    weekday: "long", day: "numeric", month: "long", year: "numeric"
+  });
+
+  function renderEntries() {
+    const box = $("entries");
+    box.innerHTML = "";
+    if (!state.journal.length) {
+      const p = document.createElement("p");
+      p.className = "empty";
+      p.textContent = "Aucune page pour l'instant. Choisis un sujet et écris quelques lignes.";
+      box.appendChild(p);
+      return;
+    }
+    state.journal.forEach(j => {
+      const d = document.createElement("details");
+      d.className = "entry";
+      const s = document.createElement("summary");
+      const date = document.createElement("span");
+      date.className = "entry-date";
+      date.textContent = `${fmtDate(j.date)} (${CAT_LABELS[j.cat] || "Journal"})`;
+      const pr = document.createElement("span");
+      pr.className = "entry-prompt";
+      pr.textContent = j.prompt;
+      s.append(date, pr);
+      const txt = document.createElement("p");
+      txt.className = "entry-text";
+      txt.textContent = j.text;
+      const del = document.createElement("button");
+      del.className = "link-btn";
+      del.type = "button";
+      del.textContent = "Supprimer cette page";
+      del.addEventListener("click", () => {
+        if (!confirm("Supprimer cette page du journal ?")) return;
+        state.journal = state.journal.filter(x => x.id !== j.id);
+        save(); renderEntries();
+      });
+      d.append(s, txt, del);
+      box.appendChild(d);
+    });
+  }
+
+  $("exportBtn").addEventListener("click", () => {
+    if (!state.journal.length) { flash("Rien à exporter pour l'instant."); return; }
+    const content = state.journal.map(j =>
+      `${fmtDate(j.date)} (${CAT_LABELS[j.cat] || "Journal"})\nSujet : ${j.prompt}\n\n${j.text}\n`
+    ).join("\n----------------------------------------\n\n");
+    const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `journal-20sur20-${dayKey()}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    flash("Journal exporté.");
+  });
+
+  /* ---------- Démarrage ---------- */
+  setMode("focus");
+  shuffleAll();
+  renderImages();
+  renderScore();
+  renderTodos();
+  setCat(state.cat in PROMPTS ? state.cat : "matin", true);
+  renderEntries();
+})();
+</script>
+</body>
+</html>
